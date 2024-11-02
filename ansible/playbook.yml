@@ -1,13 +1,13 @@
 - name: Setup and run Docker containers
   hosts: localhost
   tasks:
-    # - name: Create Docker networks
-    #   command: docker network create --subnet=172.28.0.0/16 mynetwork
-    #   ignore_errors: yes
+    - name: Create Docker networks
+      command: docker network create --subnet=172.28.0.0/16 mynetwork
+      ignore_errors: yes
 
-    # - name: Create second Docker network
-    #   command: docker network create --subnet=172.29.0.0/16 mysecondnetwork
-    #   ignore_errors: yes
+    - name: Create second Docker network
+      command: docker network create --subnet=172.29.0.0/16 mysecondnetwork
+      ignore_errors: yes
 
     - name: Build target container image
       command: docker build -t target_container ./docker/target
