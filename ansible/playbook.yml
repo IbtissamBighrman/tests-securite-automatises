@@ -1,0 +1,24 @@
+# ansible/playbook.yml
+- name: Setup and run Docker containers
+  hosts: localhost
+  tasks:
+    - name: Build target container image
+      command: docker build -t target_server ./docker/target
+      args:
+        chdir: "{{ playbook_dir }}/.."
+
+    - name: Build attacker container image
+      command: docker build -t attacker ./docker/attacker
+      args:
+        chdir: "{{ playbook_dir }}/.."
+
+    - name: Run target server container
+      command: docker run -d --name target --network mynetwork --ip 172.20.0.2 target_server
+      args:
+        chdir: "{{ playbook_dir }}/.."
+
+    - name: Run attacker containers
+      loop: "{{ range(1, 5) | list }}"
+      command: docker run -d --name attacker{{ item }} --network mynetwork attacker
+      args:
+        chdir: "{{ playbook_dir }}/.."
