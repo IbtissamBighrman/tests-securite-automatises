@@ -1,14 +1,10 @@
-# docker/target/Dockerfile
-FROM node:14
+# Dockerfile pour le conteneur cible
+FROM ubuntu:20.04
 
-# Créer le répertoire de l'application
-WORKDIR /usr/src/app
+# Installer les outils nécessaires
+RUN apt-get update && \
+    apt-get install -y iputils-ping && \
+    rm -rf /var/lib/apt/lists/*
 
-# Copier l'application
-COPY app.js .
-
-# Exposer le port de l'application
-EXPOSE 3000
-
-# Démarrer le serveur Node.js
-CMD ["node", "app.js"]
+# Garder le conteneur en vie
+CMD ["tail", "-f", "/dev/null"]

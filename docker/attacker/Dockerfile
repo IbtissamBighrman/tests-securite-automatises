@@ -1,8 +1,16 @@
-# docker/attacker/Dockerfile
-FROM alpine:latest
+# Dockerfile pour le conteneur serveur qui envoie des pings
+FROM ubuntu:20.04
 
-# Installer curl pour générer du trafic
-RUN apk add --no-cache curl
+# Installer les outils nécessaires
+RUN apt-get update && \
+    apt-get install -y iputils-ping bash && \
+    rm -rf /var/lib/apt/lists/*
 
-# Script qui génère du trafic vers la cible
-CMD while true; do curl -s http://target:3000 > /dev/null; done
+# Copier le script de ping dans le conteneur
+COPY ping_server.sh /usr/local/bin/ping_server.sh
+
+# Rendre le script exécutable
+RUN chmod +x /usr/local/bin/ping_server.sh
+
+# Commande pour exécuter le script
+CMD ["/usr/local/bin/ping_server.sh"]
