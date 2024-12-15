@@ -66,11 +66,11 @@ Je rencontre de temps en temps des problèmes avec les conteneurs que je contrô
 
 ## To do :
 oussama + othman
-      - Amélioration de la base de données
-        ->db_init.sql (fichier à modifier)
-      - shématiser la base
-      - Il faut au début avoir qu'un seul sous réseau parce que on sait pas la machine cible, des qu'on sait @ip de la cible on créer le 2eme sous réseau, 
-          -> ansible playbook.yml (fichier à modifier)  
+  - Amélioration de la base de données
+    ->db_init.sql (fichier à modifier)
+  - shématiser la base
+  - Il faut au début avoir qu'un seul sous réseau parce que on sait pas la machine cible, des qu'on sait @ip de la cible on créer le 2eme sous réseau, 
+      -> ansible playbook.yml (fichier à modifier)  
 - choisissez :
   - Interface pour la administration (ajouter un client, création des contrat, augmenter le nbr de conteneurs, ….)
       ->v0: interface terminal ; v2 interface graphique
