@@ -1,0 +1,27 @@
+ Docker maintient un cache d'images, et qu'une image existante (même si vous modifiez la configuration et régénérez une nouvelle image) peut parfois ne pas se réinitialiser correctement ou être utilisée de manière incorrecte si elle a le même nom ou tag
+
+
+==> docker rmi $(docker images -q) 
+docker image
+
+
+### ssh : erreur liée à un changement de la clé d'hôte du serveur SSH 
+code  C:\Users\Morad\.ssh\known_hosts Puis supprimer l'ancienne clé d'hôte
+
+## dans container
+hostname -I ==> ip
+
+## BDD
+docker exec -it mysql-container mysql -u root -prootpassword
+
+SHOW DATABASES;
+USE containers_db;
+SHOW TABLES;
+UPDATE container SET contract_id =1;
+
+
+## cron 
+crontab -l
+crontab -e
+cat /var/log/cron_script.log
+

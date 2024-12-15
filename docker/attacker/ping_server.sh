@@ -1,7 +1,9 @@
 #!/bin/bash
 
-# Pinger l'adresse IP du conteneur cible
+TARGET="172.28.0.2"
+
+# Lancer des pings continuellement vers la cible
 while true; do
-    ping -c 4 172.29.0.2  # Adresse IP du conteneur target_container
-    sleep 5  # Attendre 5 secondes avant de pinguer à nouveau
+    ping -c 4 "$TARGET"  # Envoie 4 paquets de ping vers la cible
+    sleep 5               # Pause de 5 secondes entre chaque envoi de pings
 done

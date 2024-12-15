@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  # Service MySQL
+  mysql:
+    image: mysql:5.7   # Utilisation de MySQL 5.7
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword  # Définir le mot de passe root pour MySQL
+      MYSQL_DATABASE: containers_db      # Nom de la base de données à créer
+    ports:
+      - "3306:3306"  # Expose le port 3306 pour accéder à MySQL depuis l'extérieur
+    volumes:
+      - ./db_init.sql:/docker-entrypoint-initdb.d/db_init.sql  # Monte le script d'initialisation pour la DB
+    networks:
+      - mysql-network
+
+  # Service Admin (pour exécuter les scripts Ansible et autres tâches)
+  admin:
+    build:
+      context: .  # Utiliser le Dockerfile dans le répertoire actuel
+    container_name: admin-container
+    working_dir: /app
+    depends_on:
+      - mysql  # Assurez-vous que MySQL est prêt avant de démarrer Admin
+    command: cron -f
+    volumes:
+      - ../ansible:/app/ansible  # Monte tout le répertoire du projet dans le conteneur
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - mysql-network
+
+networks:
+  mysql-network:
+    driver: bridge

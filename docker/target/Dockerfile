@@ -1,10 +1,11 @@
-# Dockerfile pour le conteneur cible
-FROM ubuntu:20.04
+# Utiliser une image de base avec Python installé
+FROM python:3.9-slim
 
-# Installer les outils nécessaires
-RUN apt-get update && \
-    apt-get install -y iputils-ping && \
-    rm -rf /var/lib/apt/lists/*
+# Créer un répertoire pour l'application
+WORKDIR /app
 
-# Garder le conteneur en vie
-CMD ["tail", "-f", "/dev/null"]
+# Exposer le port sur lequel le serveur écoute
+EXPOSE 8080
+
+# Lancer le serveur HTTP
+CMD ["python3", "-m", "http.server", "8080"]
