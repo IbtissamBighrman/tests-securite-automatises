@@ -65,12 +65,31 @@ Je rencontre de temps en temps des problèmes avec les conteneurs que je contrô
    - verifier_contrats_expires.sh
 
 ## To do :
-- Rapport
-- Présentation
-- revoir la BDD + Shema BDD
-- Une interface admin pour la gestion ( ajouter client / contrat , augmenter le nbr de conteneurs, ... )
-- supprimer les conteneurs endommagés et les remplacer (sans oublier la màj BDD)
-- Envoie de mail au client automatisé (tâches planifiées) :  pour transmettre ces identifiants ssh + pour informer qu'un conteneur X a été endommagé et remplacer par le conteneur Y (transmettre les identifiants ssh pour le nouveau conteneur
-- script pour attack + Test
--  ....
+oussama + othman
+  - Amélioration de la base de données
+    ->db_init.sql (fichier à modifier)
+  - shématiser la base
+  - Il faut au début avoir qu'un seul sous réseau parce que on sait pas la machine cible, des qu'on sait @ip de la cible on créer le 2eme sous réseau, 
+      -> ansible playbook.yml (fichier à modifier)
+
+  
+  - Interface pour la administration (ajouter un client, création des contrat, augmenter le nbr de conteneurs, ….)
+      ->v0: interface terminal ; v2 interface graphique
+
+  - Amélioration "supprimer_conteneurs_endommages.sh"
+    ○ Vérifier si le conteneur endommagé affecter à un client
+      § Verifier si on un conteneur de plus (remplacer le conteneur)
+      § Sinon création de nouveau conteneur + remplacement
+      § Informer le client et lui envoyer les identifient pour se connecter en ssh
+  
+  - Script d'Attack plus une simulation pour le test 
+  - (amélioration) si le client demande 1000 ressources il a besoin de se connectée 10000 c'est chiant (une autre solution)
+
+  - Mail pour le client si le contrat Dead 
+      -> verifier_contrats_expires.sh (fichier à modifier)
+  - Envoyer les données de connexion ssh par mail (mot de passe temp)
+
+
+  - rapport+présentation (htal mn be3d)
+
   
