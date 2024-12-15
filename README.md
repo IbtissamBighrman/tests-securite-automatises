@@ -25,9 +25,51 @@ Je rencontre de temps en temps des problèmes avec les conteneurs que je contrô
 ## Installation et Exécution 
 
 1. **Cloner le dépôt :**
-   ```bash
-   git clone https://github.com/IbtissamBighrman/tests-securite-automatises.git
-2. **Dans le répertoire 'ansible' executez la commande suivante :**
   ```bash
-  ansible-playbook -i inventory playbook.yml
+    git clone https://github.com/IbtissamBighrman/tests-securite-automatises.git
+  ```
+2. **Dans le répertoire 'admin' executez la commande suivante :**
+  ```bash
+    docker-compose up
+  ```
+3. **Accedez au conteneur 'admin-container' :**
+  ```bash
+    docker exec -it admin-container /bin/bash
+  ```
+4. **Dans le repertoire 'ansible' executez la commande suivante :**
+   - *grâce à cette commande vous pouvez générer un nombre N de conteneurs*
+  ```bash
+    ansible-playbook -i inventory playbook.yml
+  ```
 
+## Informations utiles ##
+1. **BDD :**
+   
+  1.1.1 *Pour acceder à la BDD:*
+  ```bash
+    docker exec -it mysql-container mysql -u root -p
+  ```
+  1.1.2 *mdp:*
+  ```bash
+    rootpassword
+  ```
+  1.2 *Commandes utiles:*
+  ```bash
+    USE containers_db;
+  ```
+
+  ```bash
+    SHOW TABLES;
+  ```
+2. **Les Tâches planifiées**
+   - verifier_contrats_expires.sh
+
+## To do :
+- Rapport
+- Présentation
+- revoir la BDD + Shema BDD
+- Une interface admin pour la gestion ( ajouter client / contrat , augmenter le nbr de conteneurs )
+- supprimer les conteneurs endommagés et les remplacer (sans oublier la màj BDD)
+- Envoie de mail au client automatisé (tâches planifiées) :  pour transmettre ces identifiants ssh + pour informer qu'un conteneur X a été endommagé et remplacer par le conteneur Y (transmettre les identifiants ssh pour le nouveau conteneur
+- script pour attack + Test
+  
