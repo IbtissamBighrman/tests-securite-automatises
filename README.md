@@ -72,4 +72,5 @@ Je rencontre de temps en temps des problèmes avec les conteneurs que je contrô
 - supprimer les conteneurs endommagés et les remplacer (sans oublier la màj BDD)
 - Envoie de mail au client automatisé (tâches planifiées) :  pour transmettre ces identifiants ssh + pour informer qu'un conteneur X a été endommagé et remplacer par le conteneur Y (transmettre les identifiants ssh pour le nouveau conteneur
 - script pour attack + Test
+-  ....
   
