@@ -65,14 +65,14 @@ Je rencontre de temps en temps des problèmes avec les conteneurs que je contrô
    - verifier_contrats_expires.sh
 
 ## To do :
-oussama + othman
+`oussama + othman:`
   - Amélioration de la base de données
     ->db_init.sql (fichier à modifier)
   - shématiser la base
   - Il faut au début avoir qu'un seul sous réseau parce que on sait pas la machine cible, des qu'on sait @ip de la cible on créer le 2eme sous réseau, 
       -> ansible playbook.yml (fichier à modifier)
     
-Aymen :
+`Aymen :`
 - Interface pour la administration (ajouter un client, création des contrat, augmenter le nbr de conteneurs, ….)
     
     + v0: interface terminal ;
@@ -81,11 +81,14 @@ Aymen :
 
 - choisissez :
   
-  - Amélioration "supprimer_conteneurs_endommages.sh"
-    ○ Vérifier si le conteneur endommagé affecter à un client
-      § Verifier si on un conteneur de plus (remplacer le conteneur)
-      § Sinon création de nouveau conteneur + remplacement
-      § Informer le client et lui envoyer les identifient pour se connecter en ssh
+  - Amélioration "supprimer_conteneurs_endommages.sh":
+    
+    ○ Vérifier si le conteneur endommagé est affecté à un client :
+    
+    +  Verifier si on un conteneur disonnible :
+        
+          si oui remplacer le conteneur, Sinon création de nouveau conteneur + remplacement
+    +  Informer le client et lui envoyer les identifient pour se connecter en ssh
   
   - Script d'Attack plus une simulation pour le test 
   - (amélioration) si le client demande 1000 ressources il a besoin de se connectée 10000 c'est chiant (une autre solution)
