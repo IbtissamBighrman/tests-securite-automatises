@@ -70,11 +70,17 @@ oussama + othman
     ->db_init.sql (fichier à modifier)
   - shématiser la base
   - Il faut au début avoir qu'un seul sous réseau parce que on sait pas la machine cible, des qu'on sait @ip de la cible on créer le 2eme sous réseau, 
-      -> ansible playbook.yml (fichier à modifier)  
-- choisissez :
-  - Interface pour la administration (ajouter un client, création des contrat, augmenter le nbr de conteneurs, ….)
-      ->v0: interface terminal ; v2 interface graphique
+      -> ansible playbook.yml (fichier à modifier)
+    
+Aymen :
+- Interface pour la administration (ajouter un client, création des contrat, augmenter le nbr de conteneurs, ….)
+    
+    + v0: interface terminal ;
 
+    + v2 interface graphique
+
+- choisissez :
+  
   - Amélioration "supprimer_conteneurs_endommages.sh"
     ○ Vérifier si le conteneur endommagé affecter à un client
       § Verifier si on un conteneur de plus (remplacer le conteneur)
