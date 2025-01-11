@@ -1,6 +1,11 @@
 version: '3.8'
 
 services:
+  #configure deux services Docker : MySQL et Admin.
+  #Le service MySQL utilise l'image mysql:5.7, crée un conteneur nommé mysql-container, 
+  #définit des variables d'environnement pour le mot de passe root et le nom de la base de données,
+  #expose le port 3306,
+  #monte un script d'initialisation de la base de données. 
   # Service MySQL
   mysql:
     image: mysql:5.7   # Utilisation de MySQL 5.7
@@ -14,6 +19,15 @@ services:
       - ./db_init.sql:/docker-entrypoint-initdb.d/db_init.sql  # Monte le script d'initialisation pour la DB
     networks:
       - mysql-network
+
+
+
+
+
+
+
+  #service Admin construit son image à partir du Dockerfile dans le répertoire actuel,
+  #crée un conteneur nommé admin-container,
 
   # Service Admin (pour exécuter les scripts Ansible et autres tâches)
   admin:

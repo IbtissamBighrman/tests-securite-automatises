@@ -1,8 +1,11 @@
+
+
+
 - name: Configurer les utilisateurs et groupes dans les conteneurs Docker
   hosts: localhost
   vars_prompt:
     - name: number_of_containers
-      prompt: "Veuillez entrer le nombre de conteneurs"
+      prompt: "Veuillez entrer le nombre de conteneurs: "
       private: no
 
   tasks:
