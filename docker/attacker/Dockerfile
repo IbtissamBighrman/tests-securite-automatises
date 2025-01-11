@@ -21,7 +21,7 @@ RUN echo 'client1:password' | chpasswd
 # Appliquer des restrictions pour 'client1' : interdire la commande 'useradd' avec sudo
 RUN echo "client1 ALL=(ALL) NOPASSWD: ALL, !/usr/sbin/useradd, !/usr/sbin/adduser" > /etc/sudoers.d/client1 && \
     chmod 0440 /etc/sudoers.d/client1
-
+ 
 # Configurer SSH pour permettre l'accès uniquement aux groupes 'admins' et 'clients'
 RUN mkdir /var/run/sshd && \
     echo 'root:ansible' | chpasswd && \

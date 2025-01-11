@@ -25,3 +25,17 @@ crontab -l
 crontab -e
 cat /var/log/cron_script.log
 
+## Networks
+docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}' attacker_container_2222
+
+docker network inspect mynetwork
+
+lister les networks :
+    docker network ls
+supprimer tous les networks:
+    docker network prune -f
+    
+
+
+
+

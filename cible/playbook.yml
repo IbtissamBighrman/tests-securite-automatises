@@ -1,0 +1,42 @@
+- name: Déployer un serveur Node.js dans un conteneur Docker
+  hosts: localhost
+  vars_prompt:
+    - name: dockerfile_path
+      prompt: "Veuillez entrer le chemin vers le répertoire contenant le Dockerfile"
+      private: no
+    - name: id_cible
+      prompt: "Veuillez entrer l'ID de la machine cible"
+      private: no
+    - name: subnet
+      prompt: "Veuillez entrer le sous-réseau pour le conteneur (par exemple, 192.168.1.0/24)"
+      private: no
+
+  vars:
+    image_id_cible: "image_{{ id_cible }}"
+    container_id_cible: "container_{{ id_cible }}"
+    network_name: "network_{{ id_cible }}"
+
+  tasks:
+    - name: Créer un réseau Docker avec le sous-réseau spécifié
+      community.docker.docker_network:
+        name: "{{ network_name }}"
+        driver: bridge
+        ipam_config:
+          - subnet: "{{ subnet }}"
+
+    - name: Construire l'image Docker du conteneur cible
+      community.docker.docker_image:
+        name: "{{ image_id_cible }}"
+        build:
+          path: "{{ playbook_dir }}/{{ dockerfile_path }}"
+        source: build
+
+    - name: Exécuter le conteneur Docker et le lier au sous-réseau
+      community.docker.docker_container:
+        name: "{{ container_id_cible }}"
+        image: "{{ image_id_cible }}"
+        state: started
+        ports:
+          - "3000:3000"
+        networks:
+          - name: "{{ network_name }}"

@@ -6,30 +6,15 @@
       private: no
 
   tasks:
-    # Créer les réseaux Docker
-    - name: Créer le réseau Docker mynetwork si nécessaire
-      community.docker.docker_network:
-        name: mynetwork
-        driver: bridge
-        ipam_config:
-          - subnet: 172.28.0.0/16
-        state: present
 
-    - name: Créer le réseau Docker mysecondnetwork si nécessaire
+    - name: Créer le réseau Docker network_admin si nécessaire
       community.docker.docker_network:
-        name: mysecondnetwork
+        name: network_admin
         driver: bridge
-        ipam_config:
+        ipam_config: 
           - subnet: 172.29.0.0/16
         state: present
 
-    # Construire les images Docker
-    - name: Construire l'image du conteneur cible
-      community.docker.docker_image:
-        name: target_container
-        build:
-          path: "{{ playbook_dir }}/../docker/target"
-        source: build
 
     - name: Construire l'image du conteneur attaquant
       community.docker.docker_image:
@@ -37,17 +22,6 @@
         build:
           path: "{{ playbook_dir }}/../docker/attacker"
         source: build
-
-    # Lancer le conteneur cible
-    - name: Exécuter le conteneur serveur cible
-      community.docker.docker_container:
-        name: target_container
-        image: target_container
-        networks:
-          - name: mynetwork
-        published_ports:
-          - "8080:8080"
-        state: started
 
     - name: Lister les ports déjà utilisés par Docker
       ansible.builtin.shell: >
@@ -61,28 +35,17 @@
             range(2222, 2321) | difference(used_ports.stdout_lines | map('int') | list)
           }}
  
-    # 1. Créer les conteneurs attaquants dans mysecondnetwork uniquement
-  # 1. Créer des conteneurs attaquants dans mysecondnetwork uniquement
-    - name: Créer des conteneurs attaquants dans mysecondnetwork uniquement
+    - name: Créer des conteneurs attaquants dans network_admin 
       community.docker.docker_container:
         name: "attacker_container_{{ available_ports[item] }}"
         image: attacker_container
         networks:
-          - name: mysecondnetwork
+          - name: network_admin
         published_ports:
           - "{{ available_ports[item] }}:22"
         state: started
       loop: "{{ range(0, number_of_containers | int) | list }}"
       register: container_results
-
-    # 2. Ajouter les conteneurs attaquants à mynetwork
-    - name: Ajouter les conteneurs attaquants à mynetwork
-      community.docker.docker_network:
-        name: mynetwork
-        connected:
-          - "{{ item.container.Id }}"
-      loop: "{{ container_results.results }}"
-      when: container_results is defined
 
     # 3. Générer un mot de passe sécurisé pour chaque conteneur
       # 3. Générer un mot de passe sécurisé pour chaque conteneur
@@ -125,7 +88,7 @@
         login_user: "root"
         login_password: "rootpassword"
         login_db: "containers_db"
-        query: |
+        query: | 
           INSERT INTO container (container_id, container_name, ssh_port, image, mdp_tmp)
           VALUES
           {% for container_password in container_passwords %}
@@ -152,272 +115,3 @@
     - name: Afficher un message de confirmation
       ansible.builtin.debug:
         msg: "Les conteneurs attaquants ont été créés et leurs informations ont été insérées dans la base de données."
-
-# okkk
-# - name: Configurer les utilisateurs et groupes dans les conteneurs Docker
-#   hosts: localhost
-#   vars_prompt:
-#     - name: number_of_containers
-#       prompt: "Veuillez entrer le nombre de conteneurs"
-#       private: no
-
-#   tasks:
-    
-#     # Créer le réseau Docker mynetwork si nécessaire
-#     - name: Créer le réseau Docker mynetwork si nécessaire
-#       community.docker.docker_network:
-#         name: mynetwork
-#         driver: bridge
-#         ipam_config:
-#           - subnet: 172.28.0.0/16
-#         state: present
-
-#     # Créer le réseau Docker mysecondnetwork si nécessaire
-#     - name: Créer le réseau Docker mysecondnetwork si nécessaire
-#       community.docker.docker_network:
-#         name: mysecondnetwork
-#         driver: bridge
-#         ipam_config:
-#           - subnet: 172.29.0.0/16
-#         state: present
-
-#     # Construire l'image du conteneur cible
-#     - name: Construire l'image du conteneur cible
-#       community.docker.docker_image:
-#         name: target_container
-#         build:
-#           path: "{{ playbook_dir }}/../docker/target"
-#         source: build
-
-#     # Exécuter le conteneur serveur cible
-#     - name: Exécuter le conteneur serveur cible
-#       community.docker.docker_container:
-#         name: target_container
-#         image: target_container
-#         networks:
-#           - name: mynetwork
-#         published_ports:
-#           - "8080:8080"
-
-#     # Construire l'image du conteneur attaquant
-#     - name: Construire l'image du conteneur attaquant
-#       community.docker.docker_image:
-#         name: attacker_container
-#         build:
-#           path: "{{ playbook_dir }}/../docker/attacker"
-#         source: build
-
-#     # Créer des conteneurs attaquants dans mysecondnetwork et les connecter à mynetwork
-#     - name: Créer des conteneurs attaquants dans mysecondnetwork et les connecter à mynetwork
-#       community.docker.docker_container:
-#         name: "attacker_container{{ item+1 }}"
-#         image: attacker_container
-#         networks:
-#           - name: mysecondnetwork
-#           - name: mynetwork
-#         published_ports:
-#           - "{{ 2222 + item +1}}:22"  # Utiliser un port unique pour chaque conteneur
-#         state: started
-#       loop: "{{ range(0, number_of_containers | int) | list }}"  # Correction de la plage pour la boucle
-#       register: container_results
-
-#     # Insérer les informations des conteneurs dans la base de données
-#     - name: Insérer les informations des conteneurs dans la base de données
-#       community.mysql.mysql_query:
-#         login_host: "mysql-container" 
-#         login_port: 3306
-#         login_user: "root"
-#         login_password: "rootpassword"
-#         login_db: "containers_db"
-#         query: |
-#           INSERT INTO container (container_id, container_name, ssh_port)
-#           VALUES
-#           {% for container in container_results.results %}
-#             ("{{ container.container.Id }}", "{{ container.container.Name }}", {{ 2222 + loop.index0 }})
-#             {% if not loop.last %}, {% endif %}
-#           {% endfor %};
-#       when: container_results is defined
-
-#     # Afficher un message de confirmation
-#     - name: Afficher un message de confirmation
-#       ansible.builtin.debug:
-#         msg: "Les conteneurs attaquants ont été créés et leurs informations ont été insérées dans la base de données."
-#     # Ajouter une tâche cron pour vérifier les contrats expirés toutes les minutes
-#     - name: Ajouter une tâche cron pour vérifier les contrats expirés
-#       cron:
-#         name: "Vérification des contrats expirés"
-#         minute: "*/1"  # Exécution toutes les minutes
-#         job: "/app/ansible/verifier_contrats_expires.sh"  # Chemin vers le script de vérification des contrats expirés
-#         state: present
-
-# ok V2
-# - name: Configurer les utilisateurs et groupes dans les conteneurs Docker
-#   hosts: localhost
-#   vars_prompt:
-#     - name: number_of_containers
-#       prompt: "Veuillez entrer le nombre de conteneurs"
-#       private: no
-
-#   tasks:
-#     - name: Créer le réseau Docker mynetwork si nécessaire
-#       community.docker.docker_network:
-#         name: mynetwork
-#         driver: bridge
-#         ipam_config:
-#           - subnet: 172.28.0.0/16
-#         state: present
-
-#     - name: Créer le réseau Docker mysecondnetwork si nécessaire
-#       community.docker.docker_network:
-#         name: mysecondnetwork
-#         driver: bridge
-#         ipam_config:
-#           - subnet: 172.29.0.0/16
-#         state: present
-
-#     - name: Construire l'image du conteneur cible
-#       community.docker.docker_image:
-#         name: target_container
-#         build:
-#           path: "{{ playbook_dir }}/../docker/target"
-#         source: build
-
-#     - name: Exécuter le conteneur serveur cible
-#       community.docker.docker_container:
-#         name: target_container
-#         image: target_container
-#         networks:
-#           - name: mynetwork
-#             ipv4_address: 172.28.0.2
-#         published_ports:
-#           - "8080:8080"
-
-#     - name: Construire l'image du conteneur attaquant
-#       community.docker.docker_image:
-#         name: attacker_container
-#         build:
-#           path: "{{ playbook_dir }}/../docker/attacker"
-#         source: build
-
-#     - name: Créer des conteneurs attaquants dans mysecondnetwork et les connecter à mynetwork
-#       community.docker.docker_container:
-#         name: "attacker_container{{ item }}"
-#         image: attacker_container
-#         networks:
-#           - name: mysecondnetwork
-#             ipv4_address: "172.29.0.{{ item }}"
-#           - name: mynetwork
-#             ipv4_address: "172.28.0.{{ item }}"
-#         published_ports:
-#           - "{{ 2222 + item }}:22"  # Utiliser un port unique pour chaque conteneur
-#         state: started
-#       loop: "{{ range(4, number_of_containers | int + 4) | list }}"
-
-# ******************ok 
-# - name: Configurer et exécuter des conteneurs Docker
-#   hosts: localhost
-#   vars_prompt:
-#     - name: number_of_containers
-#       prompt: "Veuillez entrer le nombre de conteneurs"
-#       private: no
-
-#   tasks:
-#     - name: Créer le réseau Docker mynetwork
-#       command: docker network create --subnet=172.28.0.0/16 mynetwork
-#       ignore_errors: yes
-
-#     - name: Créer le réseau Docker mysecondnetwork
-#       command: docker network create --subnet=172.29.0.0/16 mysecondnetwork
-#       ignore_errors: yes
-
-#     - name: Construire l'image du conteneur cible
-#       command: docker build -t target_container ./docker/target
-#       args:
-#         chdir: "{{ playbook_dir }}/.."
-
-#     - name: Exécuter le conteneur serveur cible
-#       command: docker run -d --name target_container --network mynetwork -p 8080:8080 --ip 172.28.0.2 target_container
-#       ignore_errors: yes
-
-#     - name: Construire l'image du conteneur attaquant
-#       command: docker build -t attacker_container ./docker/attacker
-#       args:
-#         chdir: "{{ playbook_dir }}/.."
-
-#     - name: Créer des conteneurs attaquants dans mysecondnetwork
-#       command: >
-#         docker run -d --name attacker_container{{ item }} --network mysecondnetwork --ip 172.29.0.{{ item }} attacker_container
-#       loop: "{{ range(4, number_of_containers | int + 4) | list }}"
-#       register: created_containers
-
-#     - name: Connecter chaque conteneur attaquant à mynetwork
-#       command: docker network connect --ip 172.28.0.{{ item }} mynetwork attacker_container{{ item }}
-#       loop: "{{ range(4, number_of_containers | int + 4) | list }}"
-
-
-# certificat
-# - name: Configurer et exécuter des conteneurs Docker
-#   hosts: localhost
-#   vars_prompt:
-#     - name: number_of_containers
-#       prompt: "Veuillez entrer le nombre de conteneurs"
-#       private: no
-
-#   tasks:
-#     - name: Créer le réseau Docker mynetwork
-#       docker_network:
-#         name: mynetwork
-#         driver: bridge
-#         ipam_config:
-#           - subnet: 172.28.0.0/16
-#         state: present
-
-#     - name: Créer le réseau Docker mysecondnetwork
-#       docker_network:
-#         name: mysecondnetwork
-#         driver: bridge
-#         ipam_config:
-#           - subnet: 172.29.0.0/16
-#         state: present
-
-#     - name: Construire l'image du conteneur cible
-#       docker_image:
-#         path: ./docker/target        # Spécifiez ici le chemin du répertoire contenant le Dockerfile
-#         name: target_container
-#         state: present
-
-#     - name: Exécuter le conteneur serveur cible
-#       docker_container:
-#         name: target_container
-#         image: target_container
-#         networks:
-#           - name: mynetwork
-#             ipv4_address: 172.28.0.2
-#         published_ports:
-#           - "8080:8080"
-#         state: started
-
-#     - name: Construire l'image du conteneur attaquant
-#       docker_image:
-#         path: ./docker/attacker      # Spécifiez ici le chemin du répertoire contenant le Dockerfile
-#         name: attacker_container
-#         state: present
-
-#     - name: Créer des conteneurs attaquants dans mysecondnetwork
-#       docker_container:
-#         name: "attacker_container{{ item }}"
-#         image: attacker_container
-#         networks:
-#           - name: mysecondnetwork
-#             ipv4_address: "172.29.0.{{ item }}"
-#         state: started
-#       loop: "{{ range(4, number_of_containers | int + 4) | list }}"
-#       register: created_containers
-
-#     - name: Connecter chaque conteneur attaquant à mynetwork
-#       docker_network:
-#         name: mynetwork
-#         containers:
-#           - "attacker_container{{ item }}"
-#         state: connected
-#       loop: "{{ range(4, number_of_containers | int + 4) | list }}"
