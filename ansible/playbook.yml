@@ -23,7 +23,7 @@
           path: "{{ playbook_dir }}/../docker/attacker"
         source: build
 
-    - name: Lister les ports déjà utilisés par Docker
+    - name: Lister les ports déjà utilisés par Docker.
       ansible.builtin.shell: >
         /usr/bin/docker ps --format '{{"{{.Ports}}"}}' | grep -o '[0-9]\{4,\}' | cut -d: -f1
       register: used_ports

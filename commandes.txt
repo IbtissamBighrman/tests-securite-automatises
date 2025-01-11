@@ -1,2 +1,2 @@
 ansible-playbook -i inventory playbook.yml
-docker rm -f $(docker ps -a -q); docker network rm mynetwork mysecondnetwork
+docker rm -f $(docker ps -a -q); docker network rm mynetwork 
