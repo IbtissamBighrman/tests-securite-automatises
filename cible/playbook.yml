@@ -1,51 +1,53 @@
+          
 - name: Déployer un serveur Node.js dans un conteneur Docker à partir de la base de données
   hosts: localhost
   vars:
-    db_name: containers_db
-    db_user: your_db_username  # Remplacez par votre nom d'utilisateur MySQL
-    db_password: your_db_password  # Remplacez par votre mot de passe MySQL
+    db_name: containers_db   # Nom de la base de données contenant les informations des conteneurs
+    db_user: root            # Utilisateur de la base de données
+    db_password: rootpassword # Mot de passe de l'utilisateur de la base de données
 
   tasks:
     - name: Récupérer target_ip et subnet depuis la base de données
       community.mysql.mysql_query:
-        login_db: "{{ db_name }}"
-        login_user: "{{ db_user }}"
-        login_password: "{{ db_password }}"
-        query: SELECT target_ip, target_network FROM target WHERE contract_id = 1;  # Remplacez avec le bon ID si nécessaire
-      register: target_data
+        login_db: "{{ db_name }}"   # Connexion à la base de données spécifiée
+        login_user: "{{ db_user }}" # Utilisation de l'utilisateur spécifié pour la connexion
+        login_password: "{{ db_password }}" # Utilisation du mot de passe spécifié pour la connexion
+        query: SELECT target_ip, target_network FROM target WHERE contract_id = 1;  # Requête SQL pour obtenir l'adresse IP et le sous-réseau d'un contrat spécifique
+      register: target_data  # Enregistrement des résultats de la requête dans une variable
 
     - name: Vérifier si les données de cible sont récupérées
       debug:
         msg: "Target IP: {{ target_data.results[0].result[0].target_ip }} / Subnet: {{ target_data.results[0].result[0].target_network }}"
+        # Affiche l'IP cible et le sous-réseau obtenus à partir de la base de données pour vérification
 
     - name: Extraire target_ip et subnet
       set_fact:
-        target_ip: "{{ target_data.results[0].result[0].target_ip }}"
-        subnet: "{{ target_data.results[0].result[0].target_network }}"
+        target_ip: "{{ target_data.results[0].result[0].target_ip }}"  # Extraction de l'IP cible pour utilisation ultérieure
+        subnet: "{{ target_data.results[0].result[0].target_network }}" # Extraction du sous-réseau cible pour utilisation ultérieure
 
     - name: Créer un réseau Docker avec le sous-réseau spécifié
       community.docker.docker_network:
-        name: "network_{{ target_ip }}"
-        driver: bridge
+        name: "network_{{ target_ip }}"  # Nom du réseau Docker basé sur l'IP cible
+        driver: bridge  # Utilisation du pilote 'bridge' pour le réseau Docker
         ipam_config:
-          - subnet: "{{ subnet }}"
+          - subnet: "{{ subnet }}"  # Configuration de l'IPAM avec le sous-réseau spécifié
 
     - name: Construire l'image Docker du conteneur cible
       community.docker.docker_image:
-        name: "image_{{ target_ip }}"
+        name: "image_{{ target_ip }}"  # Nom de l'image Docker basée sur l'IP cible
         build:
-          path: "{{ playbook_dir }}/{{ dockerfile_path }}"  # Assurez-vous d'obtenir ce chemin quelque part ou de définir statiquement
-        source: build
+          path: "{{ playbook_dir }}/{{ dockerfile_path }}"  # Chemin vers le répertoire contenant le Dockerfile
+        source: build  # Instruction pour construire l'image à partir du Dockerfile
 
     - name: Exécuter le conteneur Docker et le lier au sous-réseau
       community.docker.docker_container:
-        name: "container_{{ target_ip }}"
-        image: "image_{{ target_ip }}"
-        state: started
+        name: "container_{{ target_ip }}"  # Nom du conteneur Docker basé sur l'IP cible
+        image: "image_{{ target_ip }}"     # Image du conteneur Docker à utiliser pour démarrer le conteneur
+        state: started                     # Démarre le conteneur Docker
         ports:
-          - "3000:3000"
+          - "3000:3000"  # Publication du port 3000 du conteneur vers le port 3000 de l'hôte
         networks:
-          - name: "network_{{ target_ip }}"
+          - name: "network_{{ target_ip }}"  # Binds the container to the specified Docker network
 
 
 
