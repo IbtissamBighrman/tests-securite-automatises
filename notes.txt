@@ -30,10 +30,12 @@ docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}' at
 
 docker network inspect mynetwork
 
-lister les networks :
+lister les networks : 
     docker network ls
 supprimer tous les networks:
     docker network prune -f
+les proprietes d'un network:
+    docker network inspect network_target_1
     
 
 

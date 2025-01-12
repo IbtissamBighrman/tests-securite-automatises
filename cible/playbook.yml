@@ -12,9 +12,9 @@
       private: no
 
   vars:
-    image_id_cible: "image_{{ id_cible }}"
-    container_id_cible: "container_{{ id_cible }}"
-    network_name: "network_{{ id_cible }}"
+    image_id_cible: "image_target{{ id_cible }}"
+    container_id_cible: "container_target{{ id_cible }}"
+    network_name: "network_target{{ id_cible }}"
 
   tasks:
     - name: Créer un réseau Docker avec le sous-réseau spécifié
