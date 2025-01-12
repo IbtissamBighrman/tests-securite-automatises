@@ -83,7 +83,20 @@ Je rencontre de temps en temps des problèmes avec les conteneurs que je contrô
   ```
 2. **Les Tâches planifiées**
    - verifier_contrats_expires.sh
+     
+2. **Génération du fichier .txt contenant les informations essentielles et envoie de ce fichier par mail au client associé à ce contrat**
+   - accéder au container de l’admin : docker exec -it admin-container /bin/bash
+   - installer mysql-connector-python: pip3 install mysql-connector-python
+   - apt-get update
+   - apt-get install python3-pip
+   - Vérification de l’installation du module : python3 -c "import mysql.connector; print('Module mysql-connector-python installé avec succès')"
+   - Installation de sendgrid : pip install sendgrid
+   - Exécution du script: python3 generate_send_email.py
 
+
+
+
+   
 ## To do :
 `oussama + othman:`
   - Amélioration de la base de données
