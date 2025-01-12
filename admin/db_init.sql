@@ -35,6 +35,20 @@ CREATE TABLE IF NOT EXISTS container (
     INDEX idx_container_type (container_name)          -- Index pour différencier admin et client (si un préfixe ou pattern est utilisé)
 );
 
+
+-- Table targets : Contient les informations des cibles réseau liées à un contrat
+CREATE TABLE IF NOT EXISTS target (
+    target_id INT AUTO_INCREMENT PRIMARY KEY,  -- Identifiant unique pour chaque cible
+    contract_id INT NOT NULL,                  -- Lien avec la table contrats
+    target_network VARCHAR(18) NOT NULL,       -- Réseau cible au format CIDR (exemple: 192.168.1.0/24)
+    target_ip VARCHAR(15) NOT NULL,            -- Adresse IP cible
+    FOREIGN KEY (contract_id) 
+        REFERENCES contract(contract_id) 
+        ON DELETE CASCADE                      -- Clé étrangère avec la table contract
+);
+
+
+
 -- Insertion de quelques clients
 INSERT INTO client (client_name, client_email) VALUES
 ('Client A', 'clientA@example.com'),
