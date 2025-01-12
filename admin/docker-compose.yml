@@ -26,6 +26,7 @@ services:
     command: cron -f
     volumes:
       - ../ansible:/app/ansible  # Monte tout le répertoire du projet dans le conteneur
+      - ../docker:/app/docker
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - mysql-network
