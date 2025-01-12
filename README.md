@@ -41,6 +41,26 @@ Je rencontre de temps en temps des problèmes avec les conteneurs que je contrô
   ```bash
     ansible-playbook -i inventory playbook.yml
   ```
+5. **Pour créer un conteneur cible et l'associer à un network:**
+  - *Dans le repertoire 'cible' :*
+  ```bash
+    ansible-playbook -i inventory playbook.yml
+  ```
+  - *Après cette commande un conteneur container_target<id_cible> et un network network_target<id_cible>* 
+
+6. **Déconnecte les réseaux qui sont liés au conteneur "attaquant" (optionnel):**
+  - *si le conteneur attaquant est déjà lié à des réseaux cibles vous pouvez les déconnecter de notre conteneur:*
+  - *Dans le répertoire 'ansible'*
+  ```bash
+    ./network_disconnect.sh <nom_du_conteneur>
+  ```
+7. **Pour associer un network à un conteneur:**
+  - *Dans le repertoire 'cible' :*
+  ```bash
+    ./network_connect.sh <nom_du_reseau> <nom_du_conteneur>
+  ```
+![architecture](./img/shema_architecture.png)
+
 
 ## Informations utiles ##
 1. **BDD :**
