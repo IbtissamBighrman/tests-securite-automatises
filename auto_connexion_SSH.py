@@ -1,3 +1,13 @@
+#################################################
+#pour vérifier que les connexion ssh ok         #
+#   sudo apt install net-tools                  #
+#   netstat -tuln | grep :<port>                #
+#       exemple: netstat -tuln | grep :22*      #
+#                                               #   
+#################################################
+
+
+#don't forget to install pymysql and paramiko
 try:
     import pymysql
 except ImportError:
@@ -105,135 +115,154 @@ def check_contract_status(contract_id: int) -> str:
 
 
 
-def get_container_info(container_id):
-    """Récupère les informations détaillées sur un conteneur spécifique."""
+def get_containers_by_contract(contract_id):
+    """
+    Récupère tous les conteneurs associés à un contrat spécifique.
+
+    Args:
+        contract_id (int): L'ID du contrat pour lequel récupérer les conteneurs.
+
+    Returns:
+        list: Une liste de dictionnaires contenant les informations des conteneurs associés au contrat.
+              Chaque dictionnaire a les clés suivantes : 'container_id', 'container_name', 'ssh_port', 'image', 'mdp_tmp'.
+              Retourne None si aucun conteneur n'est trouvé ou en cas d'erreur de connexion.
+    """
+    # Connexion à la base de données
     connection = connect_to_db()
     if not connection:
-        return
+        return None
     
     try:
         with connection.cursor() as cursor:
-            # Requête pour récupérer les informations du conteneur
+            # Requête pour récupérer les conteneurs liés à un contrat
             sql_query = """
-            SELECT c.container_id, c.container_name, c.ssh_port, c.image, c.mdp_tmp, con.start_datetime, con.end_datetime, con.status
+            SELECT c.container_id, c.container_name, c.ssh_port, c.image, c.mdp_tmp
             FROM container c
-            LEFT JOIN contract con ON c.contract_id = con.contract_id
-            WHERE c.container_id = %s;
+            WHERE c.contract_id = %s;
             """
-            cursor.execute(sql_query, (container_id,))
-            result = cursor.fetchone()
+            cursor.execute(sql_query, (contract_id,))
+            results = cursor.fetchall()
 
-            if result:
-                container_info = {
-                    'container_id': result[0],
-                    'container_name': result[1],
-                    'ssh_port': result[2],
-                    'image': result[3],
-                    'mdp_tmp': result[4],
-                    'start_datetime': result[5],
-                    'end_datetime': result[6],
-                    'status': result[7]
-                }
-                print(f"Informations du conteneur {container_id} : {container_info}")
-                return container_info
+            if results:
+                containers = []
+                # Parcours des résultats et création de la liste des conteneurs
+                for result in results:
+                    containers.append({
+                        'container_id': result[0],
+                        'container_name': result[1],
+                        'ssh_port': result[2],
+                        'image': result[3],
+                        'mdp_tmp': result[4]
+                    })
+                print(f"Conteneurs liés au contrat {contract_id} : {containers}")
+                return containers
             else:
-                print(f"Aucun conteneur trouvé avec l'ID {container_id}.")
+                print(f"Aucun conteneur trouvé pour le contrat {contract_id}.")
                 return None
     except pymysql.MySQLError as e:
         print(f"Erreur lors de l'exécution de la requête : {e}")
+        return None
     finally:
+        # Fermeture de la connexion à la base de données
         connection.close()
 
 
-# Fonction pour établir une connexion SSH avec un conteneur
-def connect_ssh(container_info: tuple) -> None:
+
+
+
+def connect_ssh(container_info: dict) -> None:
     """
     Établit une connexion SSH avec un conteneur et exécute une commande.
 
-    Cette fonction utilise les informations fournies pour se connecter à un conteneur via SSH,
-    exécute une commande simple et affiche la sortie de cette commande.
-
     Args:
-        container_info (tuple): Un tuple contenant les informations du conteneur sous la forme
-                                (nom_du_conteneur, adresse_ip, port_ssh, mot_de_passe).
+        container_info (dict): Dictionnaire contenant les informations du conteneur sous la forme :
+                               {
+                                   'container_id': int,
+                                   'container_name': str,
+                                   'ssh_port': int,
+                                   'image': str,
+                                   'mdp_tmp': str
+                               }
 
     Raises:
         Exception: Si une erreur survient lors de la connexion SSH ou de l'exécution de la commande.
     """
+    # Vérification des paramètres
+    required_keys = ['container_id', 'container_name', 'ssh_port', 'mdp_tmp']
+    if not all(key in container_info for key in required_keys):
+        print("Erreur : Les informations du conteneur sont incomplètes.")
+        return
+
     try:
         # Paramètres de connexion SSH
-        hostname = container_info[1]  # Adresse IP ou nom d'hôte du conteneur
-        port = container_info[2]  # Port SSH
-        username = "client"  # Utilisateur par défaut pour la connexion SSH
-        password = container_info[3]  # Mot de passe temporaire du conteneur
+        hostname = "127.0.0.1"  # Adresse IP (assume localhost pour ce cas)
+        port = container_info['ssh_port']  # Port SSH
+        username = "client1"  # Nom d'utilisateur par défaut
+        password = container_info['mdp_tmp']  # Mot de passe temporaire du conteneur
 
         # Création de l'objet SSHClient
         ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # Pour ajouter l'hôte automatiquement
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # Accepte automatiquement les clés non reconnues
 
         # Connexion SSH
-        print(f"Connexion SSH en cours avec le conteneur {container_info[1]} sur le port {port}...")
+        print(f"Connexion SSH en cours avec le conteneur {container_info['container_name']} sur le port {port}...")
         ssh.connect(hostname, port=port, username=username, password=password)
 
         # Exemple d'exécution d'une commande sur le conteneur via SSH
-        stdin, stdout, stderr = ssh.exec_command('echo "Commande exécutée sur le conteneur."')
-        print(stdout.read().decode())  # Affiche la sortie de la commande
+        command = 'echo "Connexion établie avec succès !"'
+        stdin, stdout, stderr = ssh.exec_command(command)
 
-        # Fermer la connexion SSH
+        # Affichage des résultats de la commande
+        output = stdout.read().decode().strip()
+        error = stderr.read().decode().strip()
+
+        if output:
+            print(f"Sortie de la commande : {output}")
+        if error:
+            print(f"Erreur de la commande : {error}")
+
+        # Fermeture de la connexion SSH
         ssh.close()
-        print(f"Connexion SSH terminée pour le conteneur {container_info[1]}.")
+        print(f"Connexion SSH terminée pour le conteneur {container_info['container_name']}.")
+    except paramiko.AuthenticationException:
+        print(f"Erreur d'authentification pour le conteneur {container_info['container_name']}. Vérifiez les identifiants.")
+    except paramiko.SSHException as ssh_error:
+        print(f"Erreur SSH avec le conteneur {container_info['container_name']} : {ssh_error}")
     except Exception as e:
-        print(f"Erreur lors de la connexion SSH avec le conteneur {container_info[1]} : {e}")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        print(f"Erreur imprévue lors de la connexion SSH avec le conteneur {container_info['container_name']} : {e}")
 
 
 
 
 def main():
-    contract_id = input("Entrez l'ID du contrat : ")
+    """
+    Fonction principale qui vérifie le statut d'un contrat et établit des connexions SSH 
+    aux conteneurs associés si le contrat est actif.
+    """
+    try:
+        contract_id = int(input("Entrez l'ID du contrat : "))  # Conversion en entier
+    except ValueError:
+        print("Erreur : L'ID du contrat doit être un nombre entier.")
+        return
+
+    # Vérification du statut du contrat
     status = check_contract_status(contract_id)
     
     if status == "active":
-        print("Le contrat est activé. Vous pouvez établir une connexion SSH.")
-        # Ajoutez ici le code pour établir une connexion SSH si nécessaire
-        containers=get_container_info(contract_id)
+        print("Le contrat est activé. Récupération des informations des conteneurs...")
+        containers = get_containers_by_contract(contract_id)  
+        
+        if containers:
+            for container in containers:
+                print(f"Traitement du conteneur : {container['container_name']}")
+                connect_ssh(container)  # Établir la connexion SSH pour chaque conteneur actif
+        else:
+            print(f"Aucun conteneur actif trouvé pour le contrat {contract_id}.")
     elif status in ["expired", "pending"]:
         print(f"Le contrat est dans un état non activé : {status}.")
-        return
     else:
-        print("Impossible de vérifier le contrat.\n contacter les administrateurs :)")
-        return
+        print("Impossible de vérifier le contrat. Veuillez contacter les administrateurs.")
 
-
-    if containers:
-        for container in containers:
-            print(f"Traitement du conteneur : {container[1]}")
-            connect_ssh(container)  # Établir la connexion SSH pour chaque conteneur actif
-    else:
-        print("Aucun conteneur actif trouvé.")
 
 
 
