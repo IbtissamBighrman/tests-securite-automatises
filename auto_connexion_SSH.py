@@ -208,8 +208,21 @@ def connect_ssh(container_info: dict) -> None:
         print(f"Connexion SSH en cours avec le conteneur {container_info['container_name']} sur le port {port}...")
         ssh.connect(hostname, port=port, username=username, password=password)
 
-        # Exemple d'exécution d'une commande sur le conteneur via SSH
-        command = 'echo "Connexion établie avec succès !"'
+        #exécution d'une commande sur le conteneur via SSH
+
+        # Transférer le fichier ddos.py via SFTP
+        print("Transfert du fichier ddos.py vers le conteneur...")
+        sftp = ssh.open_sftp()
+        sftp.put("type_attack/ddos.py", "/tmp/ddos.py")  # Chemin local et destination dans le conteneur
+        sftp.close()
+        print("Fichier ddos.py transféré avec succès.")
+
+        # Adresse IP du serveur (localhost dans ce cas)
+        SERVER="http://127.0.0.1"
+        PORT_SERVER=8080  # Port du serveur
+
+        ################## Exécuter le fichier ddos.py  #########################
+        command = "python3 /tmp/ddos.py " + SERVER + " " + str(PORT_SERVER) 
         stdin, stdout, stderr = ssh.exec_command(command)
 
         # Affichage des résultats de la commande
@@ -255,7 +268,12 @@ def main():
         if containers:
             for container in containers:
                 print(f"Traitement du conteneur : {container['container_name']}")
+                ####################SSH CONNEXION########################### 
                 connect_ssh(container)  # Établir la connexion SSH pour chaque conteneur actif
+                ###########################################################
+
+                ####################DDOS###########################
+                
         else:
             print(f"Aucun conteneur actif trouvé pour le contrat {contract_id}.")
     elif status in ["expired", "pending"]:
