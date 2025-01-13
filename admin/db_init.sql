@@ -11,6 +11,15 @@ CREATE TABLE IF NOT EXISTS client (
     client_email VARCHAR(255) NOT NULL UNIQUE   -- Email unique du client
 );
 
+-- Table target : Contient les informations des cibles réseau liées à un contrat
+CREATE TABLE IF NOT EXISTS target (
+    target_id INT AUTO_INCREMENT PRIMARY KEY,  -- Identifiant unique pour chaque cible
+    network_name VARCHAR(255) NOT NULL,          -- Réseau cible 
+    subnet VARCHAR(18) NOT NULL,
+    target_ip VARCHAR(15) NOT NULL             -- Adresse IP cible
+);
+
+
 -- Table contrats : Contient les informations des contrats liés à un client
 CREATE TABLE IF NOT EXISTS contract (
     contract_id INT AUTO_INCREMENT PRIMARY KEY,  -- Identifiant unique pour chaque contrat
@@ -18,7 +27,9 @@ CREATE TABLE IF NOT EXISTS contract (
     start_datetime DATETIME NOT NULL,            -- Date et heure de début du contrat
     end_datetime DATETIME NOT NULL,              -- Date et heure de fin du contrat
     status ENUM('active', 'expired', 'pending') NOT NULL,  -- Statut du contrat (active, expired, pending)
-    FOREIGN KEY (client_id) REFERENCES client(client_id) ON DELETE CASCADE  -- Clé étrangère avec la table client
+    target_id INT,                               -- Lien avec la table target
+    FOREIGN KEY (client_id) REFERENCES client(client_id) ON DELETE CASCADE,  -- Clé étrangère avec la table client
+    FOREIGN KEY (target_id) REFERENCES target(target_id) ON DELETE SET NULL  -- Clé étrangère avec la table target
 );
 
 -- Table containers : Contient les informations des conteneurs liés à un contrat
@@ -35,6 +46,9 @@ CREATE TABLE IF NOT EXISTS container (
     INDEX idx_container_type (container_name)          -- Index pour différencier admin et client (si un préfixe ou pattern est utilisé)
 );
 
+
+
+
 -- Insertion de quelques clients
 INSERT INTO client (client_name, client_email) VALUES
 ('Client A', 'clientA@example.com'),
@@ -45,4 +59,4 @@ INSERT INTO client (client_name, client_email) VALUES
 INSERT INTO contract (client_id, start_datetime, end_datetime, status) VALUES
 (1, '2024-01-01 08:00:00', '2024-01-24 18:20:00', 'active'),
 (2, '2024-02-01 09:00:00', '2024-12-31 18:00:00', 'pending'),
-(3, '2024-03-01 10:00:00', '2024-12-31 18:00:00', 'expired');
+(3, '2024-03-01 10:00:00', '2025-12-31 18:00:00', 'expired');

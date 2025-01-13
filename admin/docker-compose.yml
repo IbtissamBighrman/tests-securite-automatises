@@ -24,9 +24,13 @@ services:
     depends_on:
       - mysql  # Assurez-vous que MySQL est prêt avant de démarrer Admin
     command: cron -f
+    ports:
+      - "8081:80" # Expose le port 80 du conteneur sur le port 8080 de l'hôte
     volumes:
+      - ./www:/var/www/html
       - ../ansible:/app/ansible  # Monte tout le répertoire du projet dans le conteneur
       - ../docker:/app/docker
+      - ../cible:/app/cible
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - mysql-network

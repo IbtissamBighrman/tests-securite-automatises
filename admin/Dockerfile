@@ -28,6 +28,18 @@ RUN pip3 install --upgrade pip && \
 RUN ansible-galaxy collection install community.docker --force && \
     ansible-galaxy collection install community.mysql --force
 
+# Installer Apache2, PHP et les extensions nécessaires
+RUN apt-get update && apt-get install -y \
+    apache2 \
+    php \
+    libapache2-mod-php \
+    php-mysql \
+    && apt-get clean
+
+# Configurer Apache pour utiliser PHP
+RUN a2enmod php7.4
+
+
 # Créer un répertoire pour les scripts Ansible
 WORKDIR /app
 
@@ -36,3 +48,5 @@ EXPOSE 8080 3306
 
 # Définir la commande par défaut
 CMD cron -f
+CMD ["apachectl", "-D", "FOREGROUND"]
+# service apache2 status

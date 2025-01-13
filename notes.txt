@@ -7,6 +7,7 @@ docker image
 
 ### ssh : erreur liée à un changement de la clé d'hôte du serveur SSH 
 code  C:\Users\Morad\.ssh\known_hosts Puis supprimer l'ancienne clé d'hôte
+ssh client1@192.168.179.128 -p 2222
 
 ## dans container
 hostname -I ==> ip
@@ -36,6 +37,9 @@ supprimer tous les networks:
     docker network prune -f
 les proprietes d'un network:
     docker network inspect network_target_1
+
+docker network rm <network_name>
+
     
 
 

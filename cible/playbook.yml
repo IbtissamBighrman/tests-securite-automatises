@@ -1,4 +1,4 @@
-- name: Déployer un serveur Node.js dans un conteneur Docker
+- name: Gestion des cibles Docker
   hosts: localhost
   vars_prompt:
     - name: dockerfile_path
@@ -12,12 +12,14 @@
       private: no
 
   vars:
-    image_id_cible: "image_target{{ id_cible }}"
-    container_id_cible: "container_target{{ id_cible }}"
-    network_name: "network_target{{ id_cible }}"
+    image_id_cible: "image_target_{{ id_cible }}"
+    container_id_cible: "container_target_{{ id_cible }}"
+    network_name: "network_target_{{ subnet }}"
+    target_network: "{{ subnet }}"
 
   tasks:
     - name: Créer un réseau Docker avec le sous-réseau spécifié
+      tags: create_container
       community.docker.docker_network:
         name: "{{ network_name }}"
         driver: bridge
@@ -25,18 +27,49 @@
           - subnet: "{{ subnet }}"
 
     - name: Construire l'image Docker du conteneur cible
+      tags: create_container
       community.docker.docker_image:
         name: "{{ image_id_cible }}"
         build:
-          path: "{{ playbook_dir }}/{{ dockerfile_path }}"
+          path: "{{ dockerfile_path }}"
         source: build
 
     - name: Exécuter le conteneur Docker et le lier au sous-réseau
+      tags: create_container
       community.docker.docker_container:
         name: "{{ container_id_cible }}"
         image: "{{ image_id_cible }}"
         state: started
-        ports:
-          - "3000:3000"
         networks:
           - name: "{{ network_name }}"
+
+    - name: Récupérer l'adresse IP du conteneur
+      tags: create_container
+      community.docker.docker_container_info:
+        name: "{{ container_id_cible }}"
+      register: container_info
+
+    - name: Insérer les informations de la cible dans la base de données pour l'option 1
+      tags: create_container
+      community.mysql.mysql_query:
+        login_host: "mysql-container"
+        login_port: 3306
+        login_user: "root"
+        login_password: "rootpassword"
+        login_db: "containers_db"
+        query: |
+          INSERT INTO target (network_name, subnet, target_ip)
+          VALUES ('{{ network_name }}', '{{ subnet }}', '{{ container_info.container.NetworkSettings.Networks[network_name].IPAddress }}');
+
+    - name: Afficher un résumé des actions effectuées
+      tags: summary
+      debug:
+        msg: |
+          - Le réseau Docker "{{ network_name }}" a été créé avec le sous-réseau "{{ subnet }}".
+          - L'image Docker "{{ image_id_cible }}" a été construite à partir du chemin spécifié "{{ dockerfile_path }}".
+          - Le conteneur Docker "{{ container_id_cible }}" a été démarré et connecté au réseau "{{ network_name }}".
+          - L'adresse IP du conteneur est : "{{ container_info.container.NetworkSettings.Networks[network_name].IPAddress }}" .
+          - Les informations de la cible ont été insérées dans la base de données "containers_db" :
+            - Network Name: {{ network_name }}
+            - Subnet: {{ subnet }}
+            - Target IP: {{ container_info.container.NetworkSettings.Networks[network_name].IPAddress }}
