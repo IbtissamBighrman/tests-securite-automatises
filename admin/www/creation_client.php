@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Créer un Client - Auto Pintest</title>
+    <title>Créer un Client - Auto Pentest</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -71,7 +71,7 @@
 </head>
 <body>
 
-    <h1>Auto Pintest</h1>
+    <h1>Auto Pentest</h1>
 
     <h2>Créer un Client</h2>
 

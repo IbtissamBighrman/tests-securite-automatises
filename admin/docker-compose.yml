@@ -23,7 +23,7 @@ services:
     working_dir: /app
     depends_on:
       - mysql  # Assurez-vous que MySQL est prêt avant de démarrer Admin
-    command: cron -f
+    command: cron -f && service apache2 start
     ports:
       - "8081:80" # Expose le port 80 du conteneur sur le port 8080 de l'hôte
     volumes:

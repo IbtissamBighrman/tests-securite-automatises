@@ -14,7 +14,8 @@ RUN npm install
 COPY . .
 
 # Exposer le port sur lequel le serveur va écouter
-EXPOSE 3000
+EXPOSE 3333
 
 # Lancer le serveur
-CMD ["node", "server.js"]
+CMD ["tail", "-f", "/dev/null"]
+

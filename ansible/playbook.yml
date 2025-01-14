@@ -111,6 +111,13 @@
         job: "/app/ansible/verifier_contrats_expires.sh"
         state: present
 
+    - name: Ajouter une tâche cron pour vérifier les conteneurs endommagés
+      cron:
+        name: "Vérification des conteneurs endommagés"
+        minute: "*/1"
+        job: "/app/ansible/conteneur_endommage.sh"
+        state: present
+
     # Afficher un message de confirmation
     - name: Afficher un message de confirmation
       ansible.builtin.debug:

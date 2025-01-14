@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Créer un Contrat - Auto Pintest</title>
+    <title>Créer un Contrat - Auto Pentest</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -70,7 +70,7 @@
     </style>
 </head>
 <body>
-    <h1>Auto Pintest</h1>
+    <h1>Auto Pentest</h1>
 
     <h2>Créer un Contrat</h2>
 

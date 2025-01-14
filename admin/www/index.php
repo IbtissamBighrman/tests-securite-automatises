@@ -49,15 +49,15 @@
 </head>
 <body>
 
-    <h1>Auto Pintest</h1>
+    <h1>Auto Pentest</h1>
 
     <div class="button-container">
         <button class="btn-primary" onclick="window.location.href='gestion_client.php'">Afficher tous les clients</button>
         <button class="btn-success" onclick="window.location.href='creation_client.php'">Créer un client</button>
         <button class="btn-warning" onclick="window.location.href='creation_contrat.php'">Créer un contrat</button>
-        <button class="btn-danger" onclick="window.location.href='modifier_containers.php'">Modifier le nombre de conteneurs</button>
+        <button class="btn-danger" onclick="window.location.href='afficher_contrats.php'">Afficher tous les contrats</button>
         <button class="btn-warning" onclick="window.location.href='desactiver_contrat.php'">Désactiver un contrat</button>
-        <button class="btn-warning" onclick="window.location.href='execution_commande.php'">Exécuter Commande Admin</button>
+        
 
     </div>
 

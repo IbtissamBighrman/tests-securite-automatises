@@ -1,14 +1,17 @@
-// Importer Express
 const express = require('express');
 const app = express();
-const port = 3000;
 
-// Définir une route simple
-app.get('/', (req, res) => {
-  res.send('Hello World!');
+// Middleware de journalisation
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next();
 });
 
-// Démarrer le serveur
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+app.get('/', (req, res) => {
+    res.send('Hello from the server!');
+});
+
+const PORT = 3333;
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on port ${PORT}`);
 });
