@@ -8,11 +8,11 @@
 
 ## Contexte 
 
-Automatisé "Pentest"
+Automated "Pentest"
 
-  Je vis dans un pays sans RGPD où les lois sont cool concernant la vie privée, et le fait que vous pouvez "emprunter" des ressources informatiques. J'ai également un logiciel qui transforme tous les contaners que je fais "contrôle" en un nœud aidant mes clients à faire un "pentest": DDoS, phishing pour n'en nommer que quelques-uns. Mes clients aiment me demander certains de ces conteneurs que je "contrôle" afin de faire un "pentest" sur leur infrastructure "amis". 
+  I'm living in RGPD-free country where laws are cool concerning privacy,  and  the fact you may "borrow" computing resources. I also have some software that turns any contaners I do "control" into a node helping my clients to do some "pentest": DDoS, phishing to name a few. My clients like to ask me for some of those containers I "control" in order to do some "pentest" on their "friends" infrastructure. 
 
-Je rencontre de temps en temps des problèmes avec les conteneurs que je contrôle, et je les perds. Heureusement, il arrive que je prenne également le contrôle de nouvelles ressources de temps en temps. Je veux avoir un outil me permettant d'offrir une certaine qualité de serrvice à mon client, en leur fournissant, hors de mon pool de ressources, un nombre (assez) constant de ressources. 
+I experience from time to time problems with the containers I control, and I loose them. Fortunately, it happens that I also gain control of new resources from time to time. I  want to have a tool allowing me to offer some quality of service to my client, by providing them, out my resource pool, a (quite) constant number of resources. 
 
 ## Prérequis
 
@@ -28,44 +28,51 @@ Je rencontre de temps en temps des problèmes avec les conteneurs que je contrô
   ```bash
     git clone https://github.com/IbtissamBighrman/tests-securite-automatises.git
   ```
-2. **Dans le répertoire 'admin' executez la commande suivante :**
+2. **Dans le répertoire 'admin' exécutez la commande suivante :**
   ```bash
     docker-compose up
   ```
-3. **Accedez au conteneur 'admin-container' :**
+3. **Accédez au conteneur 'admin-container' :**
   ```bash
     docker exec -it admin-container /bin/bash
   ```
-4. **Dans le repertoire 'ansible' executez la commande suivante :**
+4. **Dans le répertoire 'ansible' executez la commande suivante :**
    - *grâce à cette commande vous pouvez générer un nombre N de conteneurs*
   ```bash
     ansible-playbook -i inventory playbook.yml
   ```
 5. **Pour créer un conteneur cible et l'associer à un network:**
-  - *Dans le repertoire 'cible' :*
+   - *Dans le répertoire 'cible' :*
   ```bash
     ansible-playbook -i inventory playbook.yml
   ```
-  - *Après cette commande un conteneur container_target<id_cible> et un network network_target<id_cible>* 
+   - *Après cette commande un conteneur container_target<id_cible> et un network network_target<id_cible>* 
 
-6. **Déconnecte les réseaux qui sont liés au conteneur "attaquant" (optionnel):**
-  - *si le conteneur attaquant est déjà lié à des réseaux cibles vous pouvez les déconnecter de notre conteneur:*
-  - *Dans le répertoire 'ansible'*
+6. **Lancer le serveur apache qui vous permettra d'accéder à une interface graphique**
+  
   ```bash
-    ./network_disconnect.sh <nom_du_conteneur>
+    service apache2 start
   ```
-7. **Pour associer un network à un conteneur:**
-  - *Dans le repertoire 'cible' :*
+   - *Vous pouvez maintenant créer des contrats dans l'interface admin (http://localhost:8081)*
+7. **Dans le répertoire 'ancible' :**
   ```bash
-    ./network_connect.sh <nom_du_reseau> <nom_du_conteneur>
+    ./nouveau_contrat.sh <id_contract>
   ```
+   - Ce script permet de :
+     - Connecter les conteneurs attaquants au réseau de la cible.
+
+     - Envoyer un mail de confirmation au client (avec les identifiants ssh)
+
+     - Transférer un script d'attque vers les conteneurs attaquant et lancer l'attaque ( cette étape est optionnelle : le client peut se connecter en ssh et créer son propre script d'attque )
+
+## Architecture ##
 ![architecture](./img/shema_architecture.png)
 
 
 ## Informations utiles ##
 1. **BDD :**
    
-  1.1.1 *Pour acceder à la BDD:*
+  1.1.1 *Pour accéder à la BDD:*
   ```bash
     docker exec -it mysql-container mysql -u root -p
   ```
@@ -83,54 +90,4 @@ Je rencontre de temps en temps des problèmes avec les conteneurs que je contrô
   ```
 2. **Les Tâches planifiées**
    - verifier_contrats_expires.sh
-     
-2. **Génération du fichier .txt contenant les informations essentielles et envoie de ce fichier par mail au client associé à ce contrat**
-   - accéder au container de l’admin : docker exec -it admin-container /bin/bash
-   - installer mysql-connector-python: pip3 install mysql-connector-python
-   - apt-get update
-   - apt-get install python3-pip
-   - Vérification de l’installation du module : python3 -c "import mysql.connector; print('Module mysql-connector-python installé avec succès')"
-   - Installation de sendgrid : pip install sendgrid
-   - Exécution du script: python3 generate_send_email.py
-
-
-
-
-   
-## To do :
-`oussama + othman:`
-  - Amélioration de la base de données
-    ->db_init.sql (fichier à modifier)
-  - shématiser la base
-  - Il faut au début avoir qu'un seul sous réseau parce que on sait pas la machine cible, des qu'on sait @ip de la cible on créer le 2eme sous réseau, 
-      -> ansible playbook.yml (fichier à modifier)
-    
-`Aymen :`
-- Interface pour la administration (ajouter un client, création des contrat, augmenter le nbr de conteneurs, ….)
-    
-    + v0: interface terminal ;
-
-    + v2 interface graphique
-
-- choisissez :
-  
-  - Amélioration "supprimer_conteneurs_endommages.sh":
-    
-    ○ Vérifier si le conteneur endommagé est affecté à un client :
-    
-    +  Verifier si on un conteneur disonnible :
-        
-          si oui remplacer le conteneur, Sinon création de nouveau conteneur + remplacement
-    +  Informer le client et lui envoyer les identifient pour se connecter en ssh
-  
-  - Script d'Attack plus une simulation pour le test 
-  - (amélioration) si le client demande 1000 ressources il a besoin de se connectée 10000 c'est chiant (une autre solution)
-
-  - Mail pour le client si le contrat Dead 
-      -> verifier_contrats_expires.sh (fichier à modifier)
-  - Envoyer les données de connexion ssh par mail (mot de passe temp)
-
-
-  - rapport+présentation (htal mn be3d)
-
-  
+   - conteneur_endommages.sh
