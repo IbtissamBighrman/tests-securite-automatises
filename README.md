@@ -14,18 +14,9 @@
 
 ## 📜 **Contexte**
 
-> 🕵️‍♂️ I'm living in an **RGPD-free country** where laws are cool concerning privacy and the fact you may "borrow" computing resources.  
-I also have software that turns any containers I do "control" into a **node helping my clients** to do some **"pentests"**:  
-➡️ **DDoS**,  
-➡️ **Phishing**,  
-... to name a few.
+> 🕵️‍♂️ I'm living in RGPD-free country where laws are cool concerning privacy,  and  the fact you may "borrow" computing resources. I also have some software that turns any contaners I do "control" into a node helping my clients to do some "pentest": **DDoS**, **phishing** to name a few. My clients like to ask me for some of those containers I "control" in order to do some "pentest" on their "friends" infrastructure. 
 
-🔄 **Problem**:  
-- I experience issues with losing containers from time to time.  
-- Luckily, I also gain control of new resources periodically.  
-
-🔧 **Objective**:  
-To create a tool that ensures **quality of service** by maintaining a (relatively) constant number of resources for my clients from my resource pool.
+🔧 I experience from time to time problems with the containers I control, and I loose them. Fortunately, it happens that I also gain control of new resources from time to time. I  want to have a tool allowing me to offer some quality of serrvice to my client, by providing them, out my resource pool, a (quite) constant number of resources. 
 
 ---
 
