@@ -115,4 +115,4 @@
 
 ---
 
-> 📝 **Note** : Ce projet est destiné à un usage contrôlé et responsable uniquement. Soyez toujours conscients des lois et de l'éthique dans vos projets.
+
