@@ -115,7 +115,7 @@
       cron:
         name: "Vérification des conteneurs endommagés"
         minute: "*/1"
-        job: "/app/ansible/conteneur_endommage.sh"
+        job: "/app/ansible/conteneurs_endommages.sh"
         state: present
 
     # Afficher un message de confirmation

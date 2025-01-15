@@ -1,3 +1,13 @@
 ansible-playbook -i inventory playbook.yml
 docker rm -f $(docker ps -a -q); docker network rm mynetwork 
 docker system prune -a --volumes
+update contract set end_datetime ="2024-01-01 00:00:00" where contract_id=4;
+
+pour verifier conteneur_endommager.sh :cat /var/log/cleanup_damaged_containers.log
+ssh client1@192.168.179.128 -p 2222 (mot de passe from mail) 
+
+service cron start
+
+
+docker exec -it container_target_demo /bin/bash
+
