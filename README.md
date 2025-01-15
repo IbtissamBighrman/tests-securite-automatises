@@ -73,17 +73,17 @@ I experience from time to time problems with the containers I control, and I loo
 1. **BDD :**
 ![bdd](./img/bdd.png)
 
-   1.1.1 *Pour accéder à la BDD:*
+1.1.1 *Pour accéder à la BDD:*
   ```bash
     docker exec -it mysql-container mysql -u root -p
   ```
 
-   1.1.2 *mdp:*
+1.1.2 *mdp:*
   ```bash
     rootpassword
   ```
 
-  1.2 *Commandes utiles:*
+1.2 *Commandes utiles:*
   ```bash
     USE containers_db;
   ```
